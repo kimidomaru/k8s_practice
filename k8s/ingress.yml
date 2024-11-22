@@ -4,8 +4,8 @@ kind: Ingress
 metadata:
   name: guess-game-ingress
   namespace: guess-game
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+  #annotations:
+  #  nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   ingressClassName: nginx
   rules:
