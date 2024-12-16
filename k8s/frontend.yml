@@ -1,0 +1,54 @@
+# deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: guess-game
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: kimidomaru/k8s_puc:frontend
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        env:
+        - name: REACT_APP_BACKEND_URL
+          value: "http://k8spuc.local:30080"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+
+---
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: guess-game
+  labels:
+    app: frontend
+spec: 
+  selector:
+    app: frontend
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+      nodePort: 30005
+  

@@ -1,0 +1,56 @@
+# postgres-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: guess-game
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13 # Ou outra versão específica necessária
+        env:
+          - name: POSTGRES_USER
+            value: "postgres"
+          - name: POSTGRES_PASSWORD
+            value: "secretpass"
+          - name: POSTGRES_DB
+            value: "postgres"
+        volumeMounts:
+          - name: postgres-data
+            mountPath: /var/lib/postgresql/data
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+# postgres-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: db
+  namespace: guess-game
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres
